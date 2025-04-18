@@ -1,0 +1,706 @@
+{
+    "distributed computing": [
+        [
+            "neural and evolutionary computing",
+            0.2627
+        ],
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "physics and society": [
+        [
+            "computers and society",
+            0.488
+        ],
+        [
+            "systems and control",
+            0.0346
+        ],
+        [
+            "computation and language",
+            0.0339
+        ],
+        [
+            "cryptography and security",
+            0.0329
+        ],
+        [
+            "optimization and control",
+            0.0309
+        ]
+    ],
+    "neural and evolutionary computing": [
+        [
+            "distributed computing",
+            0.2627
+        ],
+        [
+            "systems and control",
+            0.0372
+        ],
+        [
+            "computation and language",
+            0.0364
+        ],
+        [
+            "cryptography and security",
+            0.0354
+        ],
+        [
+            "optimization and control",
+            0.0333
+        ]
+    ],
+    "econometrics": [
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "statistical machine learning",
+            0.0
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "statistical finance": [
+        [
+            "computational finance",
+            0.5891
+        ],
+        [
+            "statistical machine learning",
+            0.5455
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "artificial intelligence": [
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "statistical machine learning",
+            0.0
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "graphics": [
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "statistical machine learning",
+            0.0
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "computers and society": [
+        [
+            "physics and society",
+            0.488
+        ],
+        [
+            "systems and control",
+            0.0395
+        ],
+        [
+            "computation and language",
+            0.0387
+        ],
+        [
+            "cryptography and security",
+            0.0377
+        ],
+        [
+            "optimization and control",
+            0.0354
+        ]
+    ],
+    "programming languages": [
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "statistical machine learning",
+            0.0
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "human-computer interaction": [
+        [
+            "computer vision and pattern recognition",
+            0.2249
+        ],
+        [
+            "statistical machine learning",
+            0.0
+        ],
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "systems and control electrical engineering",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ]
+    ],
+    "data structures and algorithms": [
+        [
+            "systems and control",
+            0.0427
+        ],
+        [
+            "computation and language",
+            0.0419
+        ],
+        [
+            "cryptography and security",
+            0.0407
+        ],
+        [
+            "optimization and control",
+            0.0382
+        ],
+        [
+            "social and information networks",
+            0.0359
+        ]
+    ],
+    "neurons and cognition": [
+        [
+            "systems and control",
+            0.0335
+        ],
+        [
+            "computation and language",
+            0.0328
+        ],
+        [
+            "cryptography and security",
+            0.032
+        ],
+        [
+            "optimization and control",
+            0.03
+        ],
+        [
+            "social and information networks",
+            0.0281
+        ]
+    ],
+    "architecture": [
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "statistical machine learning",
+            0.0
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "cryptography and security": [
+        [
+            "systems and control",
+            0.0495
+        ],
+        [
+            "computation and language",
+            0.0485
+        ],
+        [
+            "optimization and control",
+            0.0443
+        ],
+        [
+            "social and information networks",
+            0.0416
+        ],
+        [
+            "data structures and algorithms",
+            0.0407
+        ]
+    ],
+    "systems and control": [
+        [
+            "optimization and control",
+            0.604
+        ],
+        [
+            "systems and control electrical engineering",
+            0.5284
+        ],
+        [
+            "multiagent systems",
+            0.2326
+        ],
+        [
+            "computation and language",
+            0.0509
+        ],
+        [
+            "cryptography and security",
+            0.0495
+        ]
+    ],
+    "machine learning": [
+        [
+            "statistical machine learning",
+            0.599
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "optimization and control": [
+        [
+            "systems and control",
+            0.604
+        ],
+        [
+            "systems and control electrical engineering",
+            0.3191
+        ],
+        [
+            "computation and language",
+            0.0456
+        ],
+        [
+            "cryptography and security",
+            0.0443
+        ],
+        [
+            "social and information networks",
+            0.039
+        ]
+    ],
+    "statistics theory": [
+        [
+            "information theory",
+            0.4596
+        ],
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "risk management": [
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "statistical machine learning",
+            0.0
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "computational finance": [
+        [
+            "statistical finance",
+            0.5891
+        ],
+        [
+            "statistical machine learning",
+            0.0
+        ],
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "information theory": [
+        [
+            "statistics theory",
+            0.4596
+        ],
+        [
+            "social and information networks",
+            0.2836
+        ],
+        [
+            "information retrieval",
+            0.2642
+        ],
+        [
+            "systems and control electrical engineering",
+            0.0
+        ],
+        [
+            "computation and language",
+            0.0
+        ]
+    ],
+    "information retrieval": [
+        [
+            "information theory",
+            0.2642
+        ],
+        [
+            "social and information networks",
+            0.2226
+        ],
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "systems and control electrical engineering",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ]
+    ],
+    "software engineering": [
+        [
+            "systems and control electrical engineering",
+            0.3892
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "biomolecules": [
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "statistical machine learning",
+            0.0
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "computer vision and pattern recognition": [
+        [
+            "human-computer interaction",
+            0.2249
+        ],
+        [
+            "systems and control",
+            0.0351
+        ],
+        [
+            "computation and language",
+            0.0344
+        ],
+        [
+            "cryptography and security",
+            0.0334
+        ],
+        [
+            "optimization and control",
+            0.0314
+        ]
+    ],
+    "multiagent systems": [
+        [
+            "systems and control",
+            0.2326
+        ],
+        [
+            "systems and control electrical engineering",
+            0.1229
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "statistical machine learning",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ]
+    ],
+    "social and information networks": [
+        [
+            "information theory",
+            0.2836
+        ],
+        [
+            "information retrieval",
+            0.2226
+        ],
+        [
+            "systems and control",
+            0.0436
+        ],
+        [
+            "computation and language",
+            0.0427
+        ],
+        [
+            "cryptography and security",
+            0.0416
+        ]
+    ],
+    "robotics": [
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "statistical machine learning",
+            0.0
+        ],
+        [
+            "other quantitative biology",
+            0.0
+        ],
+        [
+            "systems and control electrical engineering",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "systems and control electrical engineering": [
+        [
+            "systems and control",
+            0.5284
+        ],
+        [
+            "software engineering",
+            0.3892
+        ],
+        [
+            "optimization and control",
+            0.3191
+        ],
+        [
+            "multiagent systems",
+            0.1229
+        ],
+        [
+            "computation and language",
+            0.0269
+        ]
+    ],
+    "statistical machine learning": [
+        [
+            "machine learning",
+            0.599
+        ],
+        [
+            "statistical finance",
+            0.5455
+        ],
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "other quantitative biology": [
+        [
+            "computation and language",
+            0.0
+        ],
+        [
+            "statistical machine learning",
+            0.0
+        ],
+        [
+            "systems and control electrical engineering",
+            0.0
+        ],
+        [
+            "robotics",
+            0.0
+        ],
+        [
+            "social and information networks",
+            0.0
+        ]
+    ],
+    "computation and language": [
+        [
+            "systems and control",
+            0.0509
+        ],
+        [
+            "cryptography and security",
+            0.0485
+        ],
+        [
+            "optimization and control",
+            0.0456
+        ],
+        [
+            "social and information networks",
+            0.0427
+        ],
+        [
+            "data structures and algorithms",
+            0.0419
+        ]
+    ]
+}

@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Дополнительные стили можно писать здесь */
+body {
+    font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+}
