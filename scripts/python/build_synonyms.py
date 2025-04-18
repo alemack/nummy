@@ -18,34 +18,28 @@ with open(INPUT_FILE, "r", encoding="utf-8") as f:
 def clean(text):
     return re.sub(r"[^a-zA-Zа-яА-Я0-9ёЁ\s\-]", "", text.lower())
 
-# Подготовка корпуса и списка тегов
-corpus = []
+# Сбор уникальных тегов
 tag_set = set()
-
 for article in articles:
-    title = article.get("title", "")
-    abstract = article.get("abstract", "")
-    tags = article.get("tags", [])
+    tag_set.update(article.get("tags", []))
 
-    corpus.append(clean(f"{title} {abstract}"))
-    tag_set.update(tags)
-
-# Очищаем теги и добавляем их к корпусу
-tag_texts = [clean(tag) for tag in tag_set]
-corpus.extend(tag_texts)
-
-# Векторизация TF-IDF
-vectorizer = TfidfVectorizer()
-X = vectorizer.fit_transform(corpus)
-
-# Последние len(tag_texts) векторов — это наши теги
 terms = list(tag_set)
-term_vectors = X[-len(terms):]
+tag_texts = [clean(tag) for tag in terms]
 
-# Вычисление косинусного сходства между тегами
-similarities = cosine_similarity(term_vectors)
+if not terms:
+    print("Нет тегов для анализа. Проверь входной файл.")
+    exit()
 
-# Формирование словаря синонимов с весами
+print(f"Начинаем обработку {len(terms)} тегов...")
+
+# Векторизация
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(tag_texts)
+
+print("TF-IDF векторизация завершена.")
+
+# Косинусное сходство
+similarities = cosine_similarity(X)
 result = {}
 
 for i, term in enumerate(terms):
@@ -62,8 +56,8 @@ for i, term in enumerate(terms):
 
     result[term] = similar_terms
 
-# Сохранение в JSON
+# Сохранение результата
 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
     json.dump(result, f, ensure_ascii=False, indent=4)
 
-print(f"Готово! Словарь синонимов с весами сохранён в {OUTPUT_FILE}")
+print(f"Готово! Словарь синонимов для {len(terms)} тегов сохранён в {OUTPUT_FILE}")

@@ -65,19 +65,25 @@ TOPICS = [
 
 client = arxiv.Client()
 articles = []
+seen_titles = set()
 
 # Поиск по каждой теме
 for topic in TOPICS:
+    print(f"Собираем статьи по теме: {topic}")
     search = arxiv.Search(
         query=topic,
-        max_results=25,
+        max_results=500,
         sort_by=arxiv.SortCriterion.Relevance
     )
     for result in client.results(search):
-        # Преобразуем категории в читаемые теги, фильтруем пустые
         readable_tags = [CATEGORY_MAP.get(cat) for cat in result.categories if CATEGORY_MAP.get(cat)]
         if not readable_tags:
-            continue  # Пропускаем, если нет читаемых тегов
+            continue
+
+        if result.title in seen_titles:
+            continue
+
+        seen_titles.add(result.title)
 
         article_data = {
             "title": result.title,
@@ -87,8 +93,9 @@ for topic in TOPICS:
             "date": result.published.strftime("%Y-%m-%dT%H:%M:%S")
         }
 
-        if article_data not in articles:
-            articles.append(article_data)
+        articles.append(article_data)
+
+print(f"\nВсего загружено статей: {len(articles)}")
 
 # Сохранение в JSON-файл
 with open("arxiv_dataset.json", "w", encoding="utf-8") as f:

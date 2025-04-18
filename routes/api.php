@@ -9,7 +9,6 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-
 Route::get('/ping', [TestController::class, 'ping']);
 
 Route::get('/search', [SearchController::class, 'search']);

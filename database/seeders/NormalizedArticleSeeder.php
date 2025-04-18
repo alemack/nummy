@@ -27,9 +27,13 @@ class NormalizedArticleSeeder extends Seeder
             return;
         }
 
-        foreach ($data as $entry) {
+        $imported = 0;
+        $skipped = 0;
+
+        foreach ($data as $i => $entry) {
             if (!isset($entry['_id']['$oid'])) {
-                echo "Пропущена запись без _id\n";
+                echo "Пропущена запись без _id на позиции $i\n";
+                $skipped++;
                 continue;
             }
 
@@ -41,8 +45,14 @@ class NormalizedArticleSeeder extends Seeder
                 'author' => $entry['author'] ?? 'Unknown',
                 'date' => $entry['date'] ?? now(),
             ]);
+
+            $imported++;
+
+            if ($imported % 1000 === 0) {
+                echo "Импортировано $imported записей...\n";
+            }
         }
 
-        echo "Импорт нормализованных статей завершён: " . count($data) . "\n";
+        echo "Импорт завершён: $imported успешно, $skipped пропущено.\n";
     }
 }

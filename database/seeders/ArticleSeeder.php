@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Article;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 
 class ArticleSeeder extends Seeder
 {
@@ -14,32 +15,39 @@ class ArticleSeeder extends Seeder
 
         $path = storage_path('app/arxiv_dataset.json');
 
-        // Проверка существования файла
-        if (!file_exists($path)) {
+        if (!File::exists($path)) {
             echo "Файл arxiv_dataset.json не найден по пути: $path\n";
             return;
         }
 
-        // Чтение и декодирование JSON
-        $json = file_get_contents($path);
+        $json = File::get($path);
         $data = json_decode($json, true);
 
-        if (!$data || !is_array($data)) {
+        if (!is_array($data) || empty($data)) {
             echo "Не удалось прочитать или декодировать JSON.\n";
             return;
         }
 
-        // Импорт записей
+        $batch = [];
+
         foreach ($data as $entry) {
-            Article::create([
+            $batch[] = [
                 'title' => $entry['title'] ?? 'Без названия',
                 'abstract' => $entry['abstract'] ?? '',
                 'tags' => $entry['tags'] ?? [],
                 'author' => $entry['author'] ?? 'Unknown',
                 'date' => $entry['date'] ?? now(),
-            ]);
+            ];
         }
 
-        echo "Импорт завершён успешно. Импортировано статей: " . count($data) . "\n";
+        // Для больших объёмов — вставка по чанкам (например, по 1000 записей)
+        $chunks = array_chunk($batch, 1000);
+
+        foreach ($chunks as $i => $chunk) {
+            Article::insert($chunk);
+            echo "Импортировано записей: " . count($chunk) . " (чанк #" . ($i + 1) . ")\n";
+        }
+
+        echo "Импорт завершён успешно. Всего импортировано статей: " . count($data) . "\n";
     }
 }

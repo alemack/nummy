@@ -8,115 +8,118 @@ use App\Services\QueryExpander;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use MongoDB\BSON\ObjectId;
+use Illuminate\Support\Collection;
 
 class SearchController extends Controller
 {
     public function search(Request $request)
     {
-        $query = $request->input('q');
-        $expand = $request->boolean('expand', false);
-        $useLemmas = $request->boolean('lemmas', true);
+        set_time_limit(120); // увеличивает лимит до 120 секунд
+        $start = microtime(true); // старт таймера
+        try {
+            $query = $request->input('q');
+            $expand = $request->boolean('expand', false);
+            $useLemmas = $request->boolean('lemmas', true);
 
-        if (!$query) {
-            return response()->json(['error' => 'Missing query'], 400);
-        }
-
-        // Расширение с весами: [['term' => '...', 'weight' => 1.0], ...]
-        $expandedTermsWithWeights = $expand
-            ? (new QueryExpander())->expandWithWeights($query)
-            : [['term' => $query, 'weight' => 1.0]];
-
-        // Извлекаем сами термины для лемматизации
-        $rawTerms = array_column($expandedTermsWithWeights, 'term');
-
-        // Лемматизируем, если нужно
-        $normalizedTerms = $useLemmas
-            ? $this->lemmatizeTerms($rawTerms)
-            : $rawTerms;
-
-        // Связываем нормализованные термины с весами
-        $termsWithWeights = [];
-        foreach ($expandedTermsWithWeights as $i => $item) {
-            $term = $normalizedTerms[$i] ?? null;
-            if ($term) {
-                $termsWithWeights[] = [
-                    'term' => $term,
-                    'weight' => floatval($item['weight'])
-                ];
+            if (!$query) {
+                return response()->json(['error' => 'Missing query'], 400);
             }
-        }
 
-        // Получаем нормализованные статьи
-        $allNormalized = NormalizedArticle::all();
+            Log::info("Запрос поиска: {$query} | expand: {$expand}, lemmas: {$useLemmas}");
 
-        // Подсчёт релевантности с учётом весов
-        $scored = $allNormalized->map(function ($normalized) use ($termsWithWeights) {
-            $score = 0;
+            $expandedTermsWithWeights = $expand
+                ? (new QueryExpander())->expandWithWeights($query)
+                : [['term' => $query, 'weight' => 1.0]];
 
-            foreach ($termsWithWeights as $tw) {
-                $term = $tw['term'];
-                $weight = $tw['weight'];
+            $rawTerms = array_column($expandedTermsWithWeights, 'term');
 
-                if (mb_stripos($normalized->title, $term) !== false) {
-                    $score += 3 * $weight;
+            $normalizedTerms = $useLemmas
+                ? $this->lemmatizeTerms($rawTerms)
+                : $rawTerms;
+
+            $termsWithWeights = [];
+            foreach ($expandedTermsWithWeights as $i => $item) {
+                $term = $normalizedTerms[$i] ?? null;
+                if ($term) {
+                    $termsWithWeights[] = [
+                        'term' => $term,
+                        'weight' => floatval($item['weight'])
+                    ];
                 }
-                if (mb_stripos($normalized->abstract, $term) !== false) {
-                    $score += 2 * $weight;
-                }
-                if (is_array($normalized->tags)) {
-                    foreach ($normalized->tags as $tag) {
-                        if (mb_stripos($tag, $term) !== false) {
-                            $score += 1 * $weight;
+            }
+
+            $scored = collect();
+
+            foreach (NormalizedArticle::cursor() as $doc) {
+                $score = 0;
+
+                foreach ($termsWithWeights as $tw) {
+                    $term = $tw['term'];
+                    $weight = $tw['weight'];
+
+                    if (mb_stripos($doc->title, $term) !== false) {
+                        $score += 3 * $weight;
+                    }
+                    if (mb_stripos($doc->abstract, $term) !== false) {
+                        $score += 2 * $weight;
+                    }
+                    if (is_array($doc->tags)) {
+                        foreach ($doc->tags as $tag) {
+                            if (mb_stripos($tag, $term) !== false) {
+                                $score += 1 * $weight;
+                            }
                         }
                     }
                 }
+
+                if ($score > 0) {
+                    $scored->push([
+                        'id' => $doc->_id,
+                        'score' => round($score, 4),
+                    ]);
+                }
             }
 
-            return [
-                'id' => $normalized->_id,
-                'score' => round($score, 4),
-            ];
-        })
-            ->filter(fn($item) => $item['score'] > 0)
-            ->sortByDesc('score')
-            ->values();
+            $scored = $scored->sortByDesc('score')->values();
 
-        // Если ничего не найдено
-        if ($scored->isEmpty()) {
-            Log::info("Нет релевантных нормализованных статей по запросу: '{$query}'");
+            if ($scored->isEmpty()) {
+                Log::info("Ничего не найдено по запросу: '{$query}'");
+                return response()->json([
+                    'query' => $query,
+                    'expanded_terms' => $expandedTermsWithWeights,
+                    'normalized_terms' => $normalizedTerms,
+                    'results' => [],
+                    'message' => 'По вашему запросу ничего не найдено.',
+                ]);
+            }
+
+            $ids = $scored->pluck('id')->map(fn($id) => new ObjectId($id))->toArray();
+            $articles = Article::whereIn('_id', $ids)->get();
+
+            $results = $articles->map(function ($article) use ($scored) {
+                $entry = $scored->firstWhere('id', $article->_id);
+                $article->score = $entry['score'] ?? 0;
+                return $article;
+            })->sortByDesc('score')->values();
+
+            $duration = round(microtime(true) - $start, 3); // в секундах
+
             return response()->json([
                 'query' => $query,
-//                'expanded_terms' => array_column($expandedTermsWithWeights, 'term'),
                 'expanded_terms' => $expandedTermsWithWeights,
                 'normalized_terms' => $normalizedTerms,
-                'results' => [],
-                'message' => 'По вашему запросу ничего не найдено.',
+                'results' => $results,
+                'duration' => $duration,
             ]);
+        } catch (\Throwable $e) {
+            Log::error("Ошибка в SearchController: " . $e->getMessage());
+            return response()->json([
+                'error' => 'Internal Server Error',
+                'details' => $e->getMessage()
+            ], 500);
         }
-
-        // Получаем оригинальные статьи по ID
-        $ids = $scored->pluck('id')->map(fn($id) => new ObjectId($id))->toArray();
-        $articles = Article::whereIn('_id', $ids)->get();
-
-        // Присваиваем score
-        $results = $articles->map(function ($article) use ($scored) {
-            $scoreEntry = $scored->firstWhere('id', $article->_id);
-            $article->score = $scoreEntry['score'] ?? 0;
-            return $article;
-        })->sortByDesc('score')->values();
-
-        return response()->json([
-            'query' => $query,
-//            'expanded_terms' => array_column($expandedTermsWithWeights, 'term'),
-            'expanded_terms' => $expandedTermsWithWeights,
-            'normalized_terms' => $normalizedTerms,
-            'results' => $results,
-        ]);
     }
 
-    /**
-     * Лемматизация массива терминов через внешний Python-скрипт
-     */
     private function lemmatizeTerms(array $terms): array
     {
         try {
@@ -141,7 +144,7 @@ class SearchController extends Controller
 
             return $decoded;
         } catch (\Throwable $e) {
-            Log::error("Ошибка при лемматизации запроса: " . $e->getMessage());
+            Log::error("Ошибка при лемматизации: " . $e->getMessage());
             return [];
         }
     }

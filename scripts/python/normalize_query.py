@@ -8,16 +8,27 @@ from pymorphy3 import MorphAnalyzer
 morph = MorphAnalyzer()
 
 def clean(text):
-    return re.sub(r"[^а-яА-Яa-zA-Z0-9ёЁ\s]", "", text.lower())
+    return re.sub(r"[^а-яА-Яa-zA-Z0-9ёЁ\s\-]", "", text.lower())
 
 def lemmatize(text):
     words = clean(text).split()
-    return [morph.parse(word)[0].normal_form for word in words]
+    lemmas = []
+
+    for word in words:
+        parsed = morph.parse(word)
+        if parsed and parsed[0].score > 0.3:
+            lemmas.append(parsed[0].normal_form)
+        else:
+            lemmas.append(word)
+    return lemmas
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("[]")
-    else:
-        query = " ".join(sys.argv[1:])
-        result = lemmatize(query)
-        print(json.dumps(result, ensure_ascii=False))
+    try:
+        if len(sys.argv) < 2:
+            print("[]")
+        else:
+            query = " ".join(sys.argv[1:])
+            result = lemmatize(query)
+            print(json.dumps(result, ensure_ascii=False))
+    except Exception as e:
+        print(json.dumps([]))  # На случай ошибки возвращаем пустой массив

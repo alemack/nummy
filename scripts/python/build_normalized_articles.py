@@ -7,11 +7,9 @@ OUTPUT_FILE = "normalized_articles.json"
 
 morph = MorphAnalyzer()
 
-# Очищаем, оставляя буквы, цифры, дефисы и пробелы
 def clean(text):
     return re.sub(r"[^\w\s\-]", "", text.lower())
 
-# Лемматизируем и фильтруем по уверенному результату, иначе оставляем оригинал
 def lemmatize(text):
     words = clean(text).split()
     lemmas = []
@@ -23,13 +21,14 @@ def lemmatize(text):
             lemmas.append(word)
     return " ".join(lemmas)
 
-# Загружаем JSON
 with open(INPUT_FILE, "r", encoding="utf-8") as f:
     raw_articles = json.load(f)
 
 normalized = []
+total = len(raw_articles)
+print(f"Начата обработка {total} статей...\n")
 
-for article in raw_articles:
+for i, article in enumerate(raw_articles, start=1):
     object_id = article.get("_id", {}).get("$oid")
     if not object_id:
         continue
@@ -43,8 +42,11 @@ for article in raw_articles:
         "date": article.get("date", "")
     })
 
-# Сохраняем результат
+    # Показываем прогресс каждые 1000 записей
+    if i % 1000 == 0 or i == total:
+        print(f"Обработано статей: {i}/{total}")
+
 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
     json.dump(normalized, f, ensure_ascii=False, indent=2)
 
-print(f"Готово! Сохранено {len(normalized)} нормализованных статей в {OUTPUT_FILE}")
+print(f"\nГотово! Сохранено {len(normalized)} нормализованных статей в {OUTPUT_FILE}")
