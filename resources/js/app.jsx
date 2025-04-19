@@ -1,10 +1,31 @@
-// import './bootstrap';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import SearchApp from './components/SearchApp';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './layout/Layout';
+import Home from './pages/Home';
+import Search from './pages/Search';
+import About from './pages/About';
+import Metrics from './pages/Metrics';
+import Dictionary from './pages/Dictionary';
+import Logs from './pages/Logs';
+import Settings from './pages/Settings';
+import Profile from './pages/Profile';
 
 ReactDOM.createRoot(document.getElementById('app')).render(
     <React.StrictMode>
-        <SearchApp />
+        <Router>
+            <Layout>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/search" element={<Search />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/metrics" element={<Metrics />} />
+                    <Route path="/dictionary" element={<Dictionary />} />
+                    <Route path="/logs" element={<Logs />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/profile" element={<Profile />} />
+                </Routes>
+            </Layout>
+        </Router>
     </React.StrictMode>
 );
