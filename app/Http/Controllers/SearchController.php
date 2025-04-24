@@ -12,6 +12,24 @@ use Illuminate\Support\Collection;
 
 class SearchController extends Controller
 {
+    /**
+     * Handles the search functionality by processing the user query, expanding it if necessary,
+     * and finding relevant results from the database, generating a score for relevance.
+     *
+     * The search process includes the following steps:
+     * - Reading the query and additional flags (`expand` and `lemmas`) from the request.
+     * - Logging the initial user query for tracking purposes.
+     * - Expanding the query terms if expansion is enabled, and further normalizing terms using lemmatization if enabled.
+     * - Scoring documents based on their relevance to the search query, using titles, abstracts, and tags.
+     * - Returning the results sorted by score, along with metadata like duration and expanded/normalized query terms.
+     *
+     * In case of errors, logs relevant error messages and returns an error response with appropriate details.
+     *
+     * @param Request $request The HTTP request containing the query and flags for expansion and lemmatization.
+     *
+     * @return \Illuminate\Http\JsonResponse The search results, including matching documents, their formatted scores,
+     *                                       normalized query terms, and other metadata, or an error response if applicable.
+     */
     public function search(Request $request)
     {
         set_time_limit(120); // увеличивает лимит до 120 секунд
@@ -120,6 +138,21 @@ class SearchController extends Controller
         }
     }
 
+    /**
+     * Processes the provided terms by lemmatizing them using an external Python script.
+     *
+     * This function constructs a command to invoke a Python script that performs
+     * lemmatization on the input terms. It handles the script’s execution, parses
+     * the output, and logs any issues encountered during the process.
+     *
+     * @param array $terms An array of terms to be lemmatized.
+     *
+     * @return array The lemmatized terms as an array. Returns an empty array if an
+     *               error occurs or the output is invalid.
+     *
+     * @throws \Throwable Logs any errors or exceptions that occur during script
+     *                    execution or result handling.
+     */
     private function lemmatizeTerms(array $terms): array
     {
         try {

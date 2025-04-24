@@ -18,11 +18,11 @@ class QueryExpander
     }
 
     /**
-     * Возвращает массив терминов с весами:
-     * [
-     *    ['term' => 'исходный_запрос', 'weight' => 1.0],
-     *    ['term' => 'синоним', 'weight' => 0.6],
-     * ]
+     * Expands a given query string with additional terms and their associated weights
+     * by searching the dictionary for synonyms.
+     *
+     * @param string $query The search term to expand.
+     * @return array An array of terms with their respective weights.
      */
     public function expandWithWeights(string $query): array
     {
