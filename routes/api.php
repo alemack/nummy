@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SynonymsController;
 use App\Http\Controllers\Api\TestController;
 use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\SearchController;
@@ -17,3 +18,5 @@ Route::get('/search', [SearchController::class, 'search']);
 Route::get('/run-evaluation', [MetricsController::class, 'runEvaluation']);
 
 
+Route::get('/synonyms', [SynonymsController::class, 'index']);
+Route::put('/synonyms/{term}', [SynonymsController::class,'update']);
