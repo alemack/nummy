@@ -7,9 +7,10 @@ import Search from './pages/Search';
 import About from './pages/About';
 import Metrics from './pages/Metrics';
 import Dictionary from './pages/Dictionary';
-import Logs from './pages/Logs';
+import SystemLogs from './pages/SystemLogs.jsx';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
+import SearchLogs from "@/pages/SearchLogs.jsx";
 
 ReactDOM.createRoot(document.getElementById('app')).render(
     <React.StrictMode>
@@ -21,9 +22,11 @@ ReactDOM.createRoot(document.getElementById('app')).render(
                     <Route path="/about" element={<About />} />
                     <Route path="/metrics" element={<Metrics />} />
                     <Route path="/dictionary" element={<Dictionary />} />
-                    <Route path="/logs" element={<Logs />} />
+                    <Route path="/search-logs" element={<SearchLogs />} />
+                    <Route path="/system-logs" element={<SystemLogs />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/search-logs" element={<SearchLogs/>} />
                 </Routes>
             </Layout>
         </Router>

@@ -1,3 +1,4 @@
+// src/components/Sidebar.jsx
 import React from 'react';
 import {
     Box,
@@ -9,7 +10,6 @@ import {
     ListItemButton,
 } from '@mui/material';
 import { NavLink } from 'react-router-dom';
-
 import {
     Home,
     Search,
@@ -17,21 +17,25 @@ import {
     BarChart,
     BookOpen,
     History,
+    Server,
     Settings,
     User
 } from 'lucide-react';
 
 const navItems = [
-    { to: '/', label: 'Home', icon: <Home size={20} /> },
-    { to: '/search', label: 'Search Articles', icon: <Search size={20} /> },
+    { to: '/',                label: 'Home',           icon: <Home size={20} /> },
+    { to: '/search',          label: 'Search Articles', icon: <Search size={20} /> },
     { divider: true },
-    { to: '/about', label: 'About Project', icon: <Info size={20} /> },
-    { to: '/metrics', label: 'Search Metrics', icon: <BarChart size={20} /> },
-    { to: '/dictionary', label: 'Synonym Dictionary', icon: <BookOpen size={20} /> },
-    { to: '/logs', label: 'Search Logs', icon: <History size={20} /> },
+
+    { to: '/about',           label: 'About Project',   icon: <Info size={20} /> },
+    { to: '/metrics',         label: 'Search Metrics',  icon: <BarChart size={20} /> },
+    { to: '/dictionary',      label: 'Synonym Dictionary', icon: <BookOpen size={20} /> },
+    { to: '/search-logs',     label: 'Search Logs',     icon: <History size={20} /> },
+    { to: '/system-logs',     label: 'System Logs',     icon: <Server size={20} /> },
+
     { divider: true },
-    { to: '/profile', label: 'Profile', icon: <User size={20} /> },
-    { to: '/settings', label: 'Settings', icon: <Settings size={20} /> },
+    { to: '/profile',         label: 'Profile',         icon: <User size={20} /> },
+    { to: '/settings',        label: 'Settings',        icon: <Settings size={20} /> },
 ];
 
 export default function Sidebar() {

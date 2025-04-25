@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use App\Models\NormalizedArticle;
+use App\Models\SearchLog;
 use App\Services\QueryExpander;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -30,7 +31,7 @@ class SearchController extends Controller
      * @return \Illuminate\Http\JsonResponse The search results, including matching documents, their formatted scores,
      *                                       normalized query terms, and other metadata, or an error response if applicable.
      */
-    public function search(Request $request)
+    public function search(Request $request): \Illuminate\Http\JsonResponse
     {
         set_time_limit(120); // увеличивает лимит до 120 секунд
         $start = microtime(true); // старт таймера
@@ -122,6 +123,16 @@ class SearchController extends Controller
 
             $duration = round(microtime(true) - $start, 3); // в секундах
 
+            SearchLog::create([
+                'query'            => $query,
+                'expanded'         => $expand,
+                'lemmas'           => $useLemmas,
+                'expanded_terms'   => $expandedTermsWithWeights,
+                'normalized_terms' => $normalizedTerms,
+                'result_count'     => $results->count(),
+                'duration'         => $duration,
+            ]);
+
             return response()->json([
                 'query' => $query,
                 'expanded_terms' => $expandedTermsWithWeights,
@@ -150,7 +161,7 @@ class SearchController extends Controller
      * @return array The lemmatized terms as an array. Returns an empty array if an
      *               error occurs or the output is invalid.
      *
-     * @throws \Throwable Logs any errors or exceptions that occur during script
+     * @throws \Throwable SystemLogs any errors or exceptions that occur during script
      *                    execution or result handling.
      */
     private function lemmatizeTerms(array $terms): array

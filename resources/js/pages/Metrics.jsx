@@ -1,8 +1,8 @@
+// src/pages/Metrics.jsx
 import React, { useState } from 'react';
 import {
     Box,
     Button,
-    CircularProgress,
     Typography,
     Alert,
     Table,
@@ -16,6 +16,8 @@ import {
     AccordionSummary,
     AccordionDetails,
     Divider,
+    Skeleton,
+    Stack
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AssessmentIcon from '@mui/icons-material/Assessment';
@@ -32,8 +34,7 @@ function Legend() {
                 <strong>P</strong> — Precision,&nbsp;
                 <strong>R</strong> — Recall,&nbsp;
                 <strong>F1</strong> — F1-score,&nbsp;
-                <strong>TP/FP/FN/TN</strong> — истинно/ложно-положительные и
-                отрицательные.&nbsp;
+                <strong>TP/FP/FN/TN</strong> — истинно/ложно-положительные и отрицательные.&nbsp;
                 <strong>ΔF1</strong> — прирост F1 относительно базового режима.
             </Typography>
         </Paper>
@@ -50,18 +51,44 @@ export default function Metrics() {
         setError(null);
         try {
             const url = '/api/run-evaluation' + (force ? '?force=1' : '');
-            const response = await axios.get(url);
-            if (response.data.status === 'success') {
-                setMetrics(response.data.metrics);
+            const { data } = await axios.get(url);
+            if (data.status === 'success') {
+                setMetrics(data.metrics);
             } else {
-                setError(response.data.message || 'Неизвестная ошибка');
+                setError(data.message || 'Неизвестная ошибка');
             }
-        } catch (e) {
+        } catch {
             setError('Не удалось выполнить запрос к серверу');
         } finally {
             setLoading(false);
         }
     };
+
+    const renderSkeletonTable = () => (
+        <Box mb={4}>
+            <Skeleton variant="text" width={200} height={32} sx={{ mb: 1 }} />
+            <TableContainer component={Paper} sx={{ boxShadow: 2 }}>
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            {['Mode','Ret','P','R','F1','TP','FP','FN','TN','ΔF1'].map((h) => (
+                                <TableCell key={h}><Skeleton /></TableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {Array.from({length: 3}).map((_, idx) => (
+                            <TableRow key={idx}>
+                                {Array.from({length: 10}).map((__, i) => (
+                                    <TableCell key={i}><Skeleton /></TableCell>
+                                ))}
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
+    );
 
     const renderFieldSet = (fs) => (
         <Box key={fs.label} mb={4}>
@@ -116,13 +143,11 @@ export default function Metrics() {
             <Box display="flex" justifyContent="flex-end" mb={2}>
                 <Button
                     variant="contained"
-                    endIcon={
-                        loading ? <CircularProgress size={20} color="inherit" /> : <AssessmentIcon />
-                    }
+                    endIcon={<AssessmentIcon />}
                     onClick={() => handleRunEvaluation(false)}
                     disabled={loading}
                 >
-                    {loading ? 'Running...' : 'Run Evaluation'}
+                    Run Evaluation
                 </Button>
                 <Button
                     sx={{ ml: 2 }}
@@ -141,18 +166,38 @@ export default function Metrics() {
                 </Alert>
             )}
 
-            {metrics?.map((qres) => (
-                <Accordion key={qres.query} defaultExpanded sx={{ mb: 2 }} elevation={1}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h6">
-                            Query: «{qres.query}» (GT = {qres.ground_truth_count})
-                        </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        {qres.field_sets.map(renderFieldSet)}
-                    </AccordionDetails>
-                </Accordion>
-            ))}
+            {loading && (
+                // пока едет запрос — рисуем 3 скелетона (по числу будущих запросов)
+                <Stack spacing={2}>
+                    {Array.from({ length: 3 }).map((_, idx) => (
+                        <Accordion key={idx} defaultExpanded>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                <Skeleton width={300} />
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                {renderSkeletonTable()}
+                                {renderSkeletonTable()}
+                                {renderSkeletonTable()}
+                            </AccordionDetails>
+                        </Accordion>
+                    ))}
+                </Stack>
+            )}
+
+            {!loading && metrics && metrics.length > 0 && (
+                metrics.map((qres) => (
+                    <Accordion key={qres.query} defaultExpanded sx={{ mb: 2 }} elevation={1}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography variant="h6">
+                                Query: «{qres.query}» (GT = {qres.ground_truth_count})
+                            </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            {qres.field_sets.map(renderFieldSet)}
+                        </AccordionDetails>
+                    </Accordion>
+                ))
+            )}
         </Box>
     );
 }

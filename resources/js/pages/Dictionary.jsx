@@ -4,7 +4,6 @@ import {
     Box,
     Typography,
     Alert,
-    CircularProgress,
     Table,
     TableBody,
     TableCell,
@@ -15,7 +14,9 @@ import {
     TextField,
     IconButton,
     Button,
-    Stack
+    Stack,
+    CircularProgress,
+    Skeleton
 } from '@mui/material';
 import { Save, Edit, Cancel, Add } from '@mui/icons-material';
 import axios from 'axios';
@@ -38,7 +39,7 @@ export default function Dictionary() {
             if (res.data.status === 'success') {
                 setDict(res.data.synonyms);
             } else {
-                setError(res.data.message);
+                setError(res.data.message || 'Не удалось загрузить словарь');
             }
         } catch (e) {
             setError('Ошибка при запросе к серверу');
@@ -66,7 +67,6 @@ export default function Dictionary() {
         try {
             const syns = editing[term];
             await axios.put(`/api/synonyms/${encodeURIComponent(term)}`, { synonyms: syns });
-            // обновим локально
             setDict(d => ({ ...d, [term]: syns }));
             cancelEdit(term);
         } catch (e) {
@@ -90,14 +90,47 @@ export default function Dictionary() {
         }));
     };
 
+    // Рендер "скелетон"-таблицы на время загрузки
+    const renderSkeleton = () => (
+        <TableContainer component={Paper} sx={{ mt: 2 }}>
+            <Table size="small">
+                <TableHead>
+                    <TableRow>
+                        {['Term','Synonym','Weight','Actions'].map((h) => (
+                            <TableCell key={h}><Skeleton width={h === 'Term' ? 100 : 60} /></TableCell>
+                        ))}
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {Array.from({ length: 5 }).map((_, idx) => (
+                        <TableRow key={idx}>
+                            <TableCell><Skeleton /></TableCell>
+                            <TableCell><Skeleton /></TableCell>
+                            <TableCell><Skeleton /></TableCell>
+                            <TableCell><Skeleton width={40} /></TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    );
+
     return (
         <Box p={3}>
-            <Typography variant="h4" gutterBottom>Synonym Dictionary</Typography>
-            {loading && <CircularProgress />}
-            {error && <Alert severity="error">{error}</Alert>}
+            <Typography variant="h4" gutterBottom>
+                Synonym Dictionary
+            </Typography>
 
-            {dict && (
-                <TableContainer component={Paper} sx={{ mt:2 }}>
+            {loading && <CircularProgress sx={{ mt: 2 }} />}
+
+            {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+
+            {!loading && !dict && !error && (
+                <Typography>Нет данных для отображения.</Typography>
+            )}
+
+            {!loading && dict && (
+                <TableContainer component={Paper} sx={{ mt: 2 }}>
                     <Table size="small">
                         <TableHead>
                             <TableRow>
@@ -113,58 +146,56 @@ export default function Dictionary() {
                                 const rows = isEditing ? editing[term] : syns;
                                 return rows.map(([syn, w], idx) => (
                                     <TableRow key={`${term}-${idx}`}>
-                                        {idx===0 ? (
+                                        {idx === 0 && (
                                             <TableCell rowSpan={rows.length} sx={{ fontWeight: 'bold' }}>
                                                 {term}
                                             </TableCell>
-                                        ) : null}
-
+                                        )}
                                         <TableCell>
                                             {isEditing
-                                                ? <TextField
-                                                    size="small"
-                                                    value={syn}
-                                                    onChange={e => updateSyn(term, idx, 'syn', e.target.value)}
-                                                />
-                                                : syn || <em>—</em>
+                                                ? (
+                                                    <TextField
+                                                        size="small"
+                                                        value={syn}
+                                                        onChange={e => updateSyn(term, idx, 'syn', e.target.value)}
+                                                    />
+                                                )
+                                                : (syn || <em>—</em>)
                                             }
                                         </TableCell>
-
                                         <TableCell align="right">
                                             {isEditing
-                                                ? <TextField
-                                                    size="small"
-                                                    type="number"
-                                                    inputProps={{ step: 0.01 }}
-                                                    value={w}
-                                                    onChange={e => updateSyn(term, idx, 'weight', e.target.value)}
-                                                />
+                                                ? (
+                                                    <TextField
+                                                        size="small"
+                                                        type="number"
+                                                        inputProps={{ step: 0.01 }}
+                                                        value={w}
+                                                        onChange={e => updateSyn(term, idx, 'weight', e.target.value)}
+                                                    />
+                                                )
                                                 : w.toFixed(4)
                                             }
                                         </TableCell>
-
-                                        {idx===0 && (
+                                        {idx === 0 && (
                                             <TableCell rowSpan={rows.length} align="center">
-                                                {isEditing
-                                                    ? (
-                                                        <Stack direction="row" spacing={1} justifyContent="center">
-                                                            <IconButton size="small" color="primary" onClick={() => saveTerm(term)}>
-                                                                <Save />
-                                                            </IconButton>
-                                                            <IconButton size="small" color="inherit" onClick={() => cancelEdit(term)}>
-                                                                <Cancel />
-                                                            </IconButton>
-                                                            <IconButton size="small" color="secondary" onClick={() => addRow(term)}>
-                                                                <Add />
-                                                            </IconButton>
-                                                        </Stack>
-                                                    )
-                                                    : (
-                                                        <IconButton size="small" onClick={() => startEdit(term)}>
-                                                            <Edit />
+                                                {isEditing ? (
+                                                    <Stack direction="row" spacing={1} justifyContent="center">
+                                                        <IconButton size="small" color="primary" onClick={() => saveTerm(term)}>
+                                                            <Save />
                                                         </IconButton>
-                                                    )
-                                                }
+                                                        <IconButton size="small" color="inherit" onClick={() => cancelEdit(term)}>
+                                                            <Cancel />
+                                                        </IconButton>
+                                                        <IconButton size="small" color="secondary" onClick={() => addRow(term)}>
+                                                            <Add />
+                                                        </IconButton>
+                                                    </Stack>
+                                                ) : (
+                                                    <IconButton size="small" onClick={() => startEdit(term)}>
+                                                        <Edit />
+                                                    </IconButton>
+                                                )}
                                             </TableCell>
                                         )}
                                     </TableRow>
@@ -174,6 +205,9 @@ export default function Dictionary() {
                     </Table>
                 </TableContainer>
             )}
+
+            {/* Если изначально dict ещё не пришёл, но loading уже false */}
+            {loading && renderSkeleton()}
         </Box>
     );
 }
