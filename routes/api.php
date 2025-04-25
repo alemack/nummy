@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\ActivityController;
+use App\Http\Controllers\Api\SavedQueriesController;
+use App\Http\Controllers\Api\SettingsController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\LogsController;
 use App\Http\Controllers\SearchLogsController;
 use App\Http\Controllers\SynonymsController;
@@ -25,3 +29,23 @@ Route::put('/synonyms/{term}', [SynonymsController::class,'update']);
 
 Route::get('/logs', [LogsController::class, 'index']);
 Route::get('/search-logs', [SearchLogsController::class, 'index']);
+
+
+
+//Route::prefix('api')->group(function() {
+    // профиль
+    Route::get('/user',     [UserController::class, 'show']);
+    Route::put('/user',     [UserController::class, 'update']);
+
+    // настройки
+    Route::get('/settings', [SettingsController::class, 'show']);
+    Route::put('/settings', [SettingsController::class, 'update']);
+
+    // сохранённые запросы
+    Route::get('/saved-queries',    [SavedQueriesController::class, 'index']);
+    Route::post('/saved-queries',   [SavedQueriesController::class, 'store']);
+    Route::delete('/saved-queries/{id}', [SavedQueriesController::class, 'destroy']);
+
+    // история активности
+    Route::get('/activity', [ActivityController::class, 'index']);
+//});

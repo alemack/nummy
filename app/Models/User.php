@@ -2,47 +2,48 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+//use Jenssegers\Mongodb\Auth\User as Authenticatable;
+//use Illuminate\Notifications\Notifiable;
+//use Jenssegers\Mongodb\Eloquent\Factories\HasFactory;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use MongoDB\Laravel\Eloquent\Model;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Соединение, указанное в config/database.php
+     */
+    protected $connection = 'mongodb';
+
+    /**
+     * Название коллекции
+     */
+    protected $collection = 'users';
+
+    /**
+     * Поля, разрешённые для массового заполнения.
      *
-     * @var list<string>
+     * @var array
      */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'avatarUrl',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Поля, скрытые при сериализации в JSON.
      *
-     * @var list<string>
+     * @var array
      */
     protected $hidden = [
         'password',
         'remember_token',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
 }

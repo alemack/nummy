@@ -34,6 +34,21 @@ class DatabaseSeeder extends Seeder
          */
 //        $this->call([ArticleSeeder::class,]);
 //        $this->call(NormalizedArticleSeeder::class);
+        // $this->call(MongoInitialSeeder::class);
+
+
+        // 1) Сначала импортируем «сырые» статьи из arxiv_dataset.json
+        // $this->call(\Database\Seeders\ArticleSeeder::class);
+
+        // 2) Нормализуем эти статьи (build_normalized_articles.py → normalized_articles.json)
+        // $this->call(\Database\Seeders\NormalizedArticleSeeder::class);
+
+        // 3) Словарь синонимов (build_synonyms.py → query_synonyms.json)
+        //    Если у вас есть сидер для него — вызовите его здесь:
+        // $this->call(\Database\Seeders\SynonymsSeeder::class);
+
+        // 4) Наконец, базовый пользователь + его настройки/логи/сохранённые запросы
+        // $this->call(\Database\Seeders\MongoInitialSeeder::class);
     }
 }
 
