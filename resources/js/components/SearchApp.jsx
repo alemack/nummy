@@ -6,6 +6,7 @@ import SearchControls from './SearchControls';
 import QuerySummary from './QuerySummary';
 import ResultsList from './ResultsList';
 import LoaderSkeleton from './LoaderSkeleton';
+import QueryPipelineInfo from './QueryPipelineInfo';
 
 export default function SearchApp() {
     const [query, setQuery] = useState('');
@@ -81,6 +82,14 @@ export default function SearchApp() {
                     Search
                 </Button>
             </Box>
+
+            <QueryPipelineInfo
+                query={query}
+                normalizedTerms={normalizedTerms}
+                expandedTerms={expandedTerms}
+                expand={expand}
+                useLemmas={useLemmas}
+            />
 
             <QuerySummary
                 articlesCount={articlesCount}
