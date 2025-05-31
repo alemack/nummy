@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-
-// App\Services\QueryExpander.php
 class QueryExpander
 {
     protected array $dictionary = [];
@@ -18,6 +16,19 @@ class QueryExpander
     }
 
     /**
+     * Нормализует строку: приводит к нижнему регистру, убирает пробелы, дефисы и подчёркивания.
+     * Например:
+     * - "multi-agent systems" → "multiagentsystems"
+     * - "MultiAgent_Systems"  → "multiagentsystems"
+     * - "multi agent systems" → "multiagentsystems"
+     */
+    protected function normalize($str) {
+        $str = mb_strtolower($str);
+        $str = str_replace(['-', '_', ' '], '', $str); // убирает дефисы, подчёркивания и пробелы полностью
+        return $str;
+    }
+
+    /**
      * Expands a given query string with additional terms and their associated weights
      * by searching the dictionary for synonyms.
      *
@@ -27,9 +38,11 @@ class QueryExpander
     public function expandWithWeights(string $query): array
     {
         $expanded = [['term' => $query, 'weight' => 1.0]];
+        $queryNorm = $this->normalize($query);
 
         foreach ($this->dictionary as $key => $synonyms) {
-            if (mb_strtolower($key) === mb_strtolower($query)) {
+            $keyNorm = $this->normalize($key);
+            if ($keyNorm === $queryNorm) {
                 foreach ($synonyms as [$synTerm, $weight]) {
                     $expanded[] = ['term' => $synTerm, 'weight' => floatval($weight)];
                 }
@@ -40,4 +53,3 @@ class QueryExpander
         return $expanded;
     }
 }
-

@@ -7,6 +7,7 @@ import QuerySummary from './QuerySummary';
 import ResultsList from './ResultsList';
 import LoaderSkeleton from './LoaderSkeleton';
 import QueryPipelineInfo from './QueryPipelineInfo';
+import SampleQueries from './SampleQueries';
 
 export default function SearchApp() {
     const [query, setQuery] = useState('');
@@ -67,6 +68,8 @@ export default function SearchApp() {
                     onChange={(e) => setQuery(e.target.value)}
                 />
             </Box>
+
+            <SampleQueries onSelect={val => setQuery(val)} />
 
             <SearchControls
                 expand={expand}
