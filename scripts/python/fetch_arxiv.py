@@ -1,7 +1,6 @@
 import arxiv
 import json
 
-# Названия категорий в читаемом виде
 CATEGORY_MAP = {
     "cs.AI": "Artificial Intelligence",
     "cs.LG": "Machine Learning",
@@ -39,7 +38,6 @@ CATEGORY_MAP = {
     "physics.soc-ph": "Physics and Society"
 }
 
-# Тематики, по которым мы хотим собрать статьи
 TOPICS = [
     "machine learning",
     "natural language processing",
@@ -67,7 +65,6 @@ client = arxiv.Client()
 articles = []
 seen_titles = set()
 
-# Поиск по каждой теме
 for topic in TOPICS:
     print(f"Собираем статьи по теме: {topic}")
     search = arxiv.Search(
@@ -89,16 +86,26 @@ for topic in TOPICS:
             "title": result.title,
             "abstract": result.summary.replace('\n', ' ').strip(),
             "tags": readable_tags,
-            "author": result.authors[0].name if result.authors else "Unknown",
-            "date": result.published.strftime("%Y-%m-%dT%H:%M:%S")
+            "authors": [a.name for a in result.authors] if result.authors else [],
+            "affiliations": [getattr(a, 'affiliation', '') for a in result.authors] if result.authors else [],
+            "date": result.published.strftime("%Y-%m-%dT%H:%M:%S") if result.published else None,
+            "updated": result.updated.strftime("%Y-%m-%dT%H:%M:%S") if hasattr(result, 'updated') and result.updated else None,
+            "arxiv_id": result.entry_id,  # Это ссылка на статью, типа "http://arxiv.org/abs/XXXX"
+            "primary_category": CATEGORY_MAP.get(result.primary_category, result.primary_category),
+            "categories": [CATEGORY_MAP.get(cat, cat) for cat in result.categories],
+            "doi": getattr(result, "doi", None),
+            "pdf_url": result.pdf_url if hasattr(result, "pdf_url") else None,
+            "comment": getattr(result, "comment", None),
+            "journal_ref": getattr(result, "journal_ref", None),
+            "lang": "en"
         }
 
         articles.append(article_data)
 
 print(f"\nВсего загружено статей: {len(articles)}")
 
-# Сохранение в JSON-файл
-with open("arxiv_dataset.json", "w", encoding="utf-8") as f:
+output_path = r"D:\projects\nummy\storage\app\arxiv_dataset.json"
+with open(output_path, "w", encoding="utf-8") as f:
     json.dump(articles, f, ensure_ascii=False, indent=2)
 
-print("Файл arxiv_dataset.json успешно сохранён.")
+print(f"Файл {output_path} успешно сохранён.")

@@ -1,9 +1,14 @@
+import sys
 import json
 import re
 from pymorphy3 import MorphAnalyzer
 
-INPUT_FILE = "articles_export.json"
-OUTPUT_FILE = "normalized_articles.json"
+if len(sys.argv) < 3:
+    print("Usage: build_normalized_articles.py <input_file> <output_file>")
+    sys.exit(1)
+
+INPUT_FILE = sys.argv[1]
+OUTPUT_FILE = sys.argv[2]
 
 morph = MorphAnalyzer()
 
@@ -29,20 +34,22 @@ total = len(raw_articles)
 print(f"Начата обработка {total} статей...\n")
 
 for i, article in enumerate(raw_articles, start=1):
-    object_id = article.get("_id", {}).get("$oid")
-    if not object_id:
+    normalized_article = dict(article)
+    normalized_article["title"] = lemmatize(article.get("title", ""))
+    normalized_article["abstract"] = lemmatize(article.get("abstract", ""))
+    normalized_article["tags"] = [lemmatize(tag) for tag in article.get("tags", [])]
+    if "categories" in article:
+        normalized_article["categories"] = [lemmatize(cat) for cat in article.get("categories", [])]
+
+    # Главная фича — корректный _id!
+    art_id = article.get("id")
+    if art_id and isinstance(art_id, str) and len(art_id) == 24:
+        normalized_article["_id"] = art_id
+    else:
+        # Если нет id или id некорректный, лучше пропустить
         continue
 
-    normalized.append({
-        "_id": { "$oid": object_id },
-        "title": lemmatize(article.get("title", "")),
-        "abstract": lemmatize(article.get("abstract", "")),
-        "tags": [lemmatize(tag) for tag in article.get("tags", [])],
-        "author": article.get("author", "Unknown"),
-        "date": article.get("date", "")
-    })
-
-    # Показываем прогресс каждые 1000 записей
+    normalized.append(normalized_article)
     if i % 1000 == 0 or i == total:
         print(f"Обработано статей: {i}/{total}")
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\SavedQueriesController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\DataLoaderController;
 use App\Http\Controllers\LogsController;
 use App\Http\Controllers\SearchLogsController;
 use App\Http\Controllers\SynonymsController;
@@ -52,3 +53,9 @@ Route::get('/search-logs', [SearchLogsController::class, 'index']);
 //});
 
 Route::post('/suggest-keywords', [AIHelperController::class, 'suggestKeywords']);
+
+Route::post('/data-loader/run', [DataLoaderController::class, 'run']);
+Route::post('/data-loader/import', [DataLoaderController::class, 'importArticles']);
+Route::post('/data-loader/export-and-normalize', [DataLoaderController::class, 'exportAndNormalize']);
+Route::post('/data-loader/import-normalized', [DataLoaderController::class, 'importNormalizedArticles']);
+Route::post('/data-loader/build-synonyms', [DataLoaderController::class, 'buildSynonyms']);

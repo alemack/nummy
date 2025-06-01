@@ -11,6 +11,7 @@ import SystemLogs from './pages/SystemLogs.jsx';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import SearchLogs from "@/pages/SearchLogs.jsx";
+import DataLoader from './pages/DataLoader';
 
 ReactDOM.createRoot(document.getElementById('app')).render(
     <React.StrictMode>
@@ -27,6 +28,7 @@ ReactDOM.createRoot(document.getElementById('app')).render(
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/search-logs" element={<SearchLogs/>} />
+                    <Route path="/data-loader" element={<DataLoader />} />
                 </Routes>
             </Layout>
         </Router>

@@ -1,12 +1,16 @@
+import sys
 import json
 import re
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Настройки
-INPUT_FILE = "normalized_articles.json"
-OUTPUT_FILE = "query_synonyms.json"
+if len(sys.argv) < 3:
+    print("Usage: build_synonyms.py <input_file> <output_file>")
+    sys.exit(1)
+
+INPUT_FILE = sys.argv[1]
+OUTPUT_FILE = sys.argv[2]
 TOP_N = 5             # Количество ближайших синонимов
 MIN_SCORE = 0.1       # Порог минимального веса для включения
 

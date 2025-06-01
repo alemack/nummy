@@ -10,6 +10,7 @@ class NormalizedArticleSeeder extends Seeder
 {
     public function run(): void
     {
+        // Очищаем коллекцию
         NormalizedArticle::query()->delete();
 
         $path = storage_path('app/normalized_articles.json');
@@ -29,28 +30,54 @@ class NormalizedArticleSeeder extends Seeder
 
         $imported = 0;
         $skipped = 0;
+        $batch = [];
 
         foreach ($data as $i => $entry) {
-            if (!isset($entry['_id']['$oid'])) {
-                echo "Пропущена запись без _id на позиции $i\n";
+            // Получаем строковый _id (или из id, если надо)
+            $id = $entry['_id'] ?? $entry['id'] ?? null;
+            // Приводим к строке
+            if (is_array($id) && isset($id['$oid'])) {
+                $id = $id['$oid'];
+            }
+
+            // Проверяем валидность _id
+            if (!$id || strlen($id) !== 24 || !ctype_xdigit($id)) {
+                echo "Пропущена запись без валидного _id на позиции $i\n";
                 $skipped++;
                 continue;
             }
 
-            NormalizedArticle::create([
-                '_id' => new ObjectId($entry['_id']['$oid']),
-                'title' => $entry['title'] ?? '',
-                'abstract' => $entry['abstract'] ?? '',
-                'tags' => $entry['tags'] ?? [],
-                'author' => $entry['author'] ?? 'Unknown',
-                'date' => $entry['date'] ?? now(),
-            ]);
-
+            $batch[] = [
+                '_id'              => new ObjectId($id),
+                'title'            => $entry['title'] ?? '',
+                'abstract'         => $entry['abstract'] ?? '',
+                'tags'             => isset($entry['tags']) && is_array($entry['tags']) ? $entry['tags'] : [],
+                'authors'          => isset($entry['authors']) && is_array($entry['authors']) ? $entry['authors'] : [],
+                'affiliations'     => isset($entry['affiliations']) && is_array($entry['affiliations']) ? $entry['affiliations'] : [],
+                'date'             => $entry['date'] ?? now(),
+                'updated'          => $entry['updated'] ?? null,
+                'arxiv_id'         => $entry['arxiv_id'] ?? null,
+                'primary_category' => $entry['primary_category'] ?? null,
+                'categories'       => isset($entry['categories']) && is_array($entry['categories']) ? $entry['categories'] : [],
+                'doi'              => $entry['doi'] ?? null,
+                'pdf_url'          => $entry['pdf_url'] ?? null,
+                'comment'          => $entry['comment'] ?? null,
+                'journal_ref'      => $entry['journal_ref'] ?? null,
+                'lang'             => $entry['lang'] ?? null,
+                'id'               => $entry['id'] ?? null,
+            ];
             $imported++;
 
             if ($imported % 1000 === 0) {
+                NormalizedArticle::insert($batch);
+                $batch = [];
                 echo "Импортировано $imported записей...\n";
             }
+        }
+
+        // Вставляем остатки
+        if (!empty($batch)) {
+            NormalizedArticle::insert($batch);
         }
 
         echo "Импорт завершён: $imported успешно, $skipped пропущено.\n";

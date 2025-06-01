@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-
 use MongoDB\Laravel\Eloquent\Model;
 
 class NormalizedArticle extends Model
@@ -11,15 +10,32 @@ class NormalizedArticle extends Model
     protected $collection = 'normalized_articles';
 
     protected $primaryKey = '_id';
-    protected $keyType = 'string';
-
     public $incrementing = false;
+    protected $keyType = 'string'; // можно оставить string — ObjectId подхватится драйвером
 
     protected $fillable = [
+        '_id',
         'title',
         'abstract',
         'tags',
-        'author',
+        'authors',
+        'affiliations',
         'date',
+        'updated',
+        'arxiv_id',
+        'primary_category',
+        'categories',
+        'doi',
+        'pdf_url',
+        'comment',
+        'journal_ref',
+        'lang',
+    ];
+
+    protected $casts = [
+        'tags'         => 'array',
+        'authors'      => 'array',
+        'affiliations' => 'array',
+        'categories'   => 'array',
     ];
 }
