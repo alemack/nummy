@@ -1,9 +1,27 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography, Paper, LinearProgress, Alert } from '@mui/material';
+import {
+    Box,
+    Button,
+    Typography,
+    Card,
+    CardHeader,
+    CardContent,
+    LinearProgress,
+    Alert,
+    Stack,
+    useTheme,
+    CircularProgress
+} from '@mui/material';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import BuildIcon from '@mui/icons-material/Build';
+import ImportExportIcon from '@mui/icons-material/ImportExport';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import axios from 'axios';
 
 export default function DataLoader() {
+    const theme = useTheme();
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
@@ -17,11 +35,10 @@ export default function DataLoader() {
     const [importingNormalized, setImportingNormalized] = useState(false);
     const [importNormalizedResult, setImportNormalizedResult] = useState(null);
 
-    // Новое: состояние для генерации синонимов
     const [buildingSynonyms, setBuildingSynonyms] = useState(false);
     const [buildSynonymsResult, setBuildSynonymsResult] = useState(null);
 
-    // 1. Загрузка статей с arXiv (Python)
+    // 1. Load articles from arXiv
     const handleLoadData = async () => {
         setLoading(true);
         setError('');
@@ -36,7 +53,7 @@ export default function DataLoader() {
         }
     };
 
-    // 2. Импорт arxiv_dataset.json в базу articles (Mongo)
+    // 2. Import into MongoDB
     const handleImport = async () => {
         setImporting(true);
         setImportResult(null);
@@ -51,7 +68,7 @@ export default function DataLoader() {
         }
     };
 
-    // 3. Экспорт articles + нормализация (Python)
+    // 3. Export and normalize
     const handleExportAndNormalize = async () => {
         setNormalizing(true);
         setNormalizeResult(null);
@@ -66,7 +83,7 @@ export default function DataLoader() {
         }
     };
 
-    // 4. Импорт normalized_articles.json в базу normalized_articles (Mongo)
+    // 4. Import normalized articles
     const handleImportNormalized = async () => {
         setImportingNormalized(true);
         setImportNormalizedResult(null);
@@ -81,7 +98,7 @@ export default function DataLoader() {
         }
     };
 
-    // 5. Генерация синонимов
+    // 5. Build synonyms
     const handleBuildSynonyms = async () => {
         setBuildingSynonyms(true);
         setBuildSynonymsResult(null);
@@ -96,101 +113,154 @@ export default function DataLoader() {
         }
     };
 
+    // Шаги пайплайна
+    const steps = [
+        {
+            label: 'Загрузить статьи с arXiv',
+            action: handleLoadData,
+            loading: loading,
+            icon: <CloudDownloadIcon sx={{ fontSize: 28, color: theme.palette.primary.main }} />,
+            color: 'primary',
+            description: 'Скачивает свежие статьи с arXiv в файл arxiv_dataset.json через Python-скрипт.',
+        },
+        {
+            label: 'Импортировать в MongoDB',
+            action: handleImport,
+            loading: importing,
+            icon: <CloudUploadIcon sx={{ fontSize: 28, color: theme.palette.secondary.main }} />,
+            color: 'secondary',
+            description: 'Загружает arxiv_dataset.json в коллекцию articles вашей MongoDB.',
+        },
+        {
+            label: 'Экспортировать и нормализовать',
+            action: handleExportAndNormalize,
+            loading: normalizing,
+            icon: <BuildIcon sx={{ fontSize: 28, color: theme.palette.success.main }} />,
+            color: 'success',
+            description: 'Выгружает статьи из базы, лемматизирует и сохраняет в normalized_articles.json.',
+        },
+        {
+            label: 'Импортировать нормализованные статьи',
+            action: handleImportNormalized,
+            loading: importingNormalized,
+            icon: <ImportExportIcon sx={{ fontSize: 28, color: theme.palette.info.main }} />,
+            color: 'info',
+            description: 'Импортирует normalized_articles.json в коллекцию normalized_articles.',
+        },
+        {
+            label: 'Сгенерировать словарь синонимов',
+            action: handleBuildSynonyms,
+            loading: buildingSynonyms,
+            icon: <AutoAwesomeIcon sx={{ fontSize: 28, color: theme.palette.warning.main }} />,
+            color: 'warning',
+            description: 'Строит query_synonyms.json по тегам (TF-IDF + косинусное сходство).',
+        },
+    ];
+
+    const anyLoading = steps.some(step => step.loading);
+
     return (
-        <Box sx={{ maxWidth: 900, mx: 'auto', mt: 5 }}>
-            <Paper elevation={2} sx={{ p: 4 }}>
+        <Box
+            sx={{
+                maxWidth: 700,
+                mx: 'auto',
+                mt: 6,
+                px: 2,
+                backgroundColor: theme.palette.background.default
+            }}
+        >
+            <Card
+                elevation={4}
+                sx={{
+                    p: 4,
+                    borderRadius: 3,
+                    backgroundColor: theme.palette.background.paper
+                }}
+            >
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
                     <CloudDownloadIcon color="primary" fontSize="large" />
-                    <Typography variant="h5" fontWeight="bold">
+                    <Typography variant="h4" fontWeight="bold">
                         Data Loader
                     </Typography>
                 </Box>
                 <Typography variant="body1" mb={3}>
-                    Здесь вы можете поэтапно запускать загрузку, импорт и обработку статей из arXiv и MongoDB. Просто нажмите нужную кнопку для выполнения соответствующего шага пайплайна.
+                    <strong>Пайплайн данных:</strong> Пройдите шаги ниже для полной подготовки данных для интеллектуального поиска.
                 </Typography>
+                <Card
+                    variant="outlined"
+                    sx={{
+                        mb: 4,
+                        backgroundColor: theme.palette.mode === 'dark' ? '#2c2f33' : '#f6f7fb',
+                        p: 2,
+                        borderLeft: `4px solid ${theme.palette.primary.main}`,
+                        borderRadius: 2
+                    }}
+                >
+                    <Box display="flex" alignItems="center" mb={1}>
+                        <InfoOutlinedIcon color="primary" sx={{ mr: 1 }} />
+                        <Typography fontWeight="bold" color="primary.main">Этапы:</Typography>
+                    </Box>
+                    <ol style={{ margin: 0, paddingLeft: 20 }}>
+                        <li><strong>Загрузка</strong>: свежие статьи arXiv</li>
+                        <li><strong>Импорт</strong>: в MongoDB</li>
+                        <li><strong>Нормализация</strong>: лемматизация</li>
+                        <li><strong>Импорт нормализованных</strong>: в новую коллекцию</li>
+                        <li><strong>Синонимы</strong>: построение словаря тегов</li>
+                    </ol>
+                </Card>
 
-                <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-                    <Button
-                        variant="contained"
+                <Stack spacing={3} mb={3}>
+                    {steps.map((step, idx) => (
+                        <Card
+                            key={step.label}
+                            elevation={2}
+                            sx={{
+                                borderLeft: `5px solid ${theme.palette[step.color].main}`,
+                                backgroundColor: theme.palette.background.paper
+                            }}
+                        >
+                            <CardHeader
+                                avatar={step.icon}
+                                title={
+                                    <Typography variant="h6" fontWeight="bold">
+                                        {`${idx + 1}. ${step.label}`}
+                                    </Typography>
+                                }
+                                action={
+                                    <Button
+                                        variant="contained"
+                                        color={step.color}
+                                        onClick={step.action}
+                                        disabled={anyLoading && !step.loading}
+                                        sx={{
+                                            textTransform: 'none',
+                                            fontWeight: 600,
+                                            fontSize: 16
+                                        }}
+                                    >
+                                        {step.loading ? (
+                                            <CircularProgress size={24} color="inherit" />
+                                        ) : (
+                                            'Выполнить'
+                                        )}
+                                    </Button>
+                                }
+                            />
+                            <CardContent sx={{ pt: 0, pb: 2 }}>
+                                <Typography variant="body2" color="text.secondary">
+                                    {step.description}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </Stack>
+
+                {anyLoading && (
+                    <LinearProgress
+                        sx={{ my: 2, borderRadius: 1 }}
                         color="primary"
-                        onClick={handleLoadData}
-                        disabled={loading || importing || normalizing || importingNormalized || buildingSynonyms}
-                        size="large"
-                    >
-                        {loading ? 'Загрузка...' : 'Стартовать загрузку данных'}
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={handleImport}
-                        disabled={importing || loading || normalizing || importingNormalized || buildingSynonyms}
-                        size="large"
-                    >
-                        {importing ? 'Импорт...' : 'Импортировать в базу'}
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="success"
-                        onClick={handleExportAndNormalize}
-                        disabled={normalizing || loading || importing || importingNormalized || buildingSynonyms}
-                        size="large"
-                    >
-                        {normalizing ? 'Экспорт и нормализация...' : 'Экспорт + нормализация'}
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="info"
-                        onClick={handleImportNormalized}
-                        disabled={importingNormalized || loading || importing || normalizing || buildingSynonyms}
-                        size="large"
-                    >
-                        {importingNormalized ? 'Импорт нормализованных...' : 'Импортировать нормализованные'}
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="warning"
-                        onClick={handleBuildSynonyms}
-                        disabled={buildingSynonyms || loading || importing || normalizing || importingNormalized}
-                        size="large"
-                    >
-                        {buildingSynonyms ? 'Генерация синонимов...' : 'Построить синонимы'}
-                    </Button>
-                </Box>
-
-                {/* ...отображение прогрессбаров... */}
-                {(loading || importing || normalizing || importingNormalized || buildingSynonyms) && (
-                    <LinearProgress sx={{ my: 2 }} color={
-                        loading ? 'primary' :
-                            importing ? 'secondary' :
-                                normalizing ? 'success' :
-                                    importingNormalized ? 'info' : 'warning'
-                    } />
-                )}
-
-                {loading && (
-                    <Typography align="center" color="text.secondary" sx={{ mt: 1 }}>
-                        Загрузка данных... Пожалуйста, подождите, это может занять несколько минут.
-                    </Typography>
-                )}
-                {importing && (
-                    <Typography align="center" color="text.secondary" sx={{ mt: 1 }}>
-                        Импорт в базу... Пожалуйста, подождите.
-                    </Typography>
-                )}
-                {normalizing && (
-                    <Typography align="center" color="text.secondary" sx={{ mt: 1 }}>
-                        Экспорт и нормализация... Пожалуйста, подождите.
-                    </Typography>
-                )}
-                {importingNormalized && (
-                    <Typography align="center" color="text.secondary" sx={{ mt: 1 }}>
-                        Импорт нормализованных статей... Пожалуйста, подождите.
-                    </Typography>
-                )}
-                {buildingSynonyms && (
-                    <Typography align="center" color="text.secondary" sx={{ mt: 1 }}>
-                        Генерация словаря синонимов... Пожалуйста, подождите.
-                    </Typography>
+                        variant="indeterminate"
+                    />
                 )}
 
                 {success && (
@@ -223,7 +293,7 @@ export default function DataLoader() {
                         {error}
                     </Alert>
                 )}
-            </Paper>
+            </Card>
         </Box>
     );
 }

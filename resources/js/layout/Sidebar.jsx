@@ -19,7 +19,8 @@ import {
     History,
     Server,
     Settings,
-    User
+    User,
+    Download
 } from 'lucide-react';
 
 const navItems = [
@@ -33,7 +34,7 @@ const navItems = [
     { to: '/search-logs',     label: 'Search Logs',     icon: <History size={20} /> },
     { to: '/system-logs',     label: 'System Logs',     icon: <Server size={20} /> },
 
-    { to: '/data-loader',     label: 'Data Loader',     icon: <Server size={20} /> },
+    { to: '/data-loader',     label: 'Data Loader',     icon: <Download size={20} /> },
 
     { divider: true },
     { to: '/profile',         label: 'Profile',         icon: <User size={20} /> },
