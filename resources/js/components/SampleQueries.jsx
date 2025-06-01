@@ -25,6 +25,7 @@ const samples = [
 
     // Научные термины, англоязычные и смешанные
     { label: "self-supervised pre-trainings", value: "self-supervised pre-trainings" },
+    { label: "statistical finance", value: "statistical finance" },
     { label: "transformer architectures", value: "transformer architectures" },
     { label: "нейронные сети глубокого обучения", value: "нейронные сети глубокого обучения" },
     { label: "distributed representation of words", value: "distributed representation of words" },

@@ -21,6 +21,25 @@ export default function SearchApp() {
     const [loading, setLoading] = useState(false);
     const [duration, setDuration] = useState(null);
     const [page, setPage] = useState(1);
+    const [suggestedKeywords, setSuggestedKeywords] = useState([]);
+    const [keywordsLoading, setKeywordsLoading] = useState(false);
+    const [keywordsError, setKeywordsError] = useState('');
+
+    const handleSuggestKeywords = async () => {
+        if (!query.trim()) return;
+        setKeywordsLoading(true);
+        setSuggestedKeywords([]);
+        setKeywordsError('');
+        try {
+            const resp = await axios.post('http://127.0.0.1:8000/api/suggest-keywords', { topic: query });
+            setSuggestedKeywords(resp.data.keywords ?? []);
+        } catch (e) {
+            setKeywordsError('Ошибка получения ключевых слов');
+            setSuggestedKeywords([]);
+        } finally {
+            setKeywordsLoading(false);
+        }
+    };
 
     const handleSearch = async () => {
         if (!query.trim()) return;
@@ -59,7 +78,7 @@ export default function SearchApp() {
 
     return (
         <>
-            <Box sx={{ mb: 2 }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
                 <TextField
                     fullWidth
                     label="Enter search query"
@@ -67,7 +86,33 @@ export default function SearchApp() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
+                <Button
+                    variant="outlined"
+                    onClick={handleSuggestKeywords}
+                    disabled={!query.trim() || keywordsLoading}
+                >
+                    {keywordsLoading ? "Подбор..." : "Suggest keywords"}
+                </Button>
             </Box>
+
+            {suggestedKeywords.length > 0 && (
+                <Box sx={{ mb: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {suggestedKeywords.map((word, i) => (
+                        <Button
+                            key={i}
+                            variant="contained"
+                            size="small"
+                            onClick={() => setQuery(word)}
+                        >
+                            {word}
+                        </Button>
+                    ))}
+                </Box>
+            )}
+
+            {keywordsError && (
+                <Typography color="error" sx={{ mb: 2 }}>{keywordsError}</Typography>
+            )}
 
             <SampleQueries onSelect={val => setQuery(val)} />
 
@@ -114,3 +159,5 @@ export default function SearchApp() {
         </>
     );
 }
+
+

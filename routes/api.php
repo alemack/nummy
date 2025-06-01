@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AIHelperController;
 use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\SavedQueriesController;
 use App\Http\Controllers\Api\SettingsController;
@@ -49,3 +50,5 @@ Route::get('/search-logs', [SearchLogsController::class, 'index']);
     // история активности
     Route::get('/activity', [ActivityController::class, 'index']);
 //});
+
+Route::post('/suggest-keywords', [AIHelperController::class, 'suggestKeywords']);
