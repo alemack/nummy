@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Article;
 use App\Models\SearchLog;
 use App\Services\QueryExpander;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Client as MongoClient;
 
 class SearchController extends Controller
@@ -107,5 +109,17 @@ class SearchController extends Controller
             Log::error("Lemmatization error: " . $e->getMessage());
             return [];
         }
+    }
+
+    /**
+     * Возвращает статью по id из коллекции articles.
+     */
+    public function getArticle($id)
+    {
+        $article = Article::where('_id', new ObjectId($id))->first();
+        if (!$article) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+        return response()->json($article);
     }
 }

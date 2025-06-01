@@ -12,6 +12,7 @@ import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import SearchLogs from "@/pages/SearchLogs.jsx";
 import DataLoader from './pages/DataLoader';
+import ArticlePage from './pages/ArticlePage';
 
 ReactDOM.createRoot(document.getElementById('app')).render(
     <React.StrictMode>
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById('app')).render(
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/search-logs" element={<SearchLogs/>} />
                     <Route path="/data-loader" element={<DataLoader />} />
+                    <Route path="/article/:id" element={<ArticlePage />} />
                 </Routes>
             </Layout>
         </Router>

@@ -59,3 +59,4 @@ Route::post('/data-loader/import', [DataLoaderController::class, 'importArticles
 Route::post('/data-loader/export-and-normalize', [DataLoaderController::class, 'exportAndNormalize']);
 Route::post('/data-loader/import-normalized', [DataLoaderController::class, 'importNormalizedArticles']);
 Route::post('/data-loader/build-synonyms', [DataLoaderController::class, 'buildSynonyms']);
+Route::get('/article/{id}', [SearchController::class, 'getArticle']);
