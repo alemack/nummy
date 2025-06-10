@@ -4,6 +4,17 @@ import { Stack, Chip, Typography, Box, IconButton, Collapse, Tooltip } from '@mu
 import { ChevronRight, ChevronDown, Info } from 'lucide-react';
 
 const samples = [
+    { label: "data structures and algorithms", value: "data structures and algorithms" },
+    { label: "operating systems", value: "operating systems" },
+    { label: "computational finance", value: "computational finance" },
+    { label: "information retrieval", value: "information retrieval" },
+    { label: "computer vision and pattern recognition", value: "computer vision and pattern recognition" },
+    { label: "statistical machine learning", value: "statistical machine learning" },
+    { label: "multiagent systems", value: "multiagent systems" },
+    { label: "neural and evolutionary computing", value: "neural and evolutionary computing" },
+    { label: "optimization and control", value: "optimization and control" },
+    { label: "information theory", value: "information theory" },
+
     // Английский с ошибками
     { label: "Machine learnings", value: "Machine learnings" },
     { label: "Natural languge procesing", value: "Natural languge procesing" },

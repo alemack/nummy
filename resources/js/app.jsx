@@ -10,9 +10,9 @@ import Dictionary from './pages/Dictionary';
 import SystemLogs from './pages/SystemLogs.jsx';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
-import SearchLogs from "@/pages/SearchLogs.jsx";
 import DataLoader from './pages/DataLoader';
 import ArticlePage from './pages/ArticlePage';
+import SearchLogs from './pages/SearchLogs';
 
 ReactDOM.createRoot(document.getElementById('app')).render(
     <React.StrictMode>

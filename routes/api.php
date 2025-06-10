@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\DataLoaderController;
 use App\Http\Controllers\LogsController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\SearchLogsController;
 use App\Http\Controllers\SynonymsController;
 use App\Http\Controllers\Api\TestController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -24,6 +26,12 @@ Route::get('/ping', [TestController::class, 'ping']);
 Route::get('/search', [SearchController::class, 'search']);
 
 Route::get('/run-evaluation', [MetricsController::class, 'runEvaluation']);
+Route::get('/metrics-summary', [MetricsController::class, 'metricsSummary']);
+Route::get('/search-logs-summary', [SearchLogsController::class, 'summary']);
+Route::get('/search-logs-summary-per-query', [SearchLogsController::class, 'summaryPerQuery']);
+Route::get('/dashboard-stats', [DashboardController::class, 'stats']);
+Route::get('/news', [NewsController::class, 'search']);
+Route::get('/metrics-data', [MetricsController::class, 'metricsData']);
 
 
 Route::get('/synonyms', [SynonymsController::class, 'index']);

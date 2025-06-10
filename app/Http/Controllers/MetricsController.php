@@ -17,7 +17,7 @@ class MetricsController extends Controller
      */
     public function runEvaluation(Request $request): JsonResponse
     {
-        $scriptPath  = base_path('scripts/python/evaluate_search/evaluate_search.py');
+        $scriptPath  = base_path('scripts/python/evaluate_search/evalution_f1_best_5.py');
         $pythonExe   = base_path('scripts/python/venv/Scripts/python.exe');
         $outputFile  = base_path('scripts/python/evaluate_search/evaluation_results.json');
 
@@ -73,4 +73,64 @@ class MetricsController extends Controller
             'metrics' => $data,   // ожидаем массив { query, ground_truth_count, field_sets }
         ]);
     }
+
+    public function metricsSummary(Request $request): JsonResponse
+    {
+        $summaryFile = base_path('scripts/python/evaluate_search/metrics_summary.json');
+
+        if (! file_exists($summaryFile)) {
+            Log::error("[MetricsController] Файл summary не найден: {$summaryFile}");
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Сводные метрики ещё не сгенерированы.',
+            ], 404);
+        }
+
+        $json = file_get_contents($summaryFile);
+        $data = json_decode($json, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Log::error("[MetricsController] Некорректный JSON в сводных метриках: " . json_last_error_msg());
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Ошибка разбора summary JSON.',
+            ], 500);
+        }
+
+        Log::info("[MetricsController] Сводные метрики загружены.");
+        return response()->json($data);
+    }
+
+
+    /**
+     * Возвращает готовый JSON из storage/app/metrics_data.json
+     */
+    public function metricsData(): JsonResponse
+    {
+        $file = storage_path('app/metrics_data.json');
+
+        if (! file_exists($file)) {
+            Log::error("[MetricsController] Файл metrics_data.json не найден: {$file}");
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Данные метрик не найдены.',
+            ], 404);
+        }
+
+        $json = @file_get_contents($file);
+        $data = json_decode($json, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Log::error("[MetricsController] Некорректный JSON в metrics_data.json: " . json_last_error_msg());
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Ошибка разбора metrics_data.json.',
+            ], 500);
+        }
+
+        Log::info("[MetricsController] metrics_data.json загружен и возвращён.");
+        return response()->json([
+            'status' => 'success',
+            'data'   => $data,
+        ]);
+    }
+
 }

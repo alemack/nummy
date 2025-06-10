@@ -1,5 +1,5 @@
 // src/pages/Settings.jsx
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
     Box,
     Typography,
@@ -10,114 +10,83 @@ import {
     Switch,
     Select,
     MenuItem,
-    Button,
-    Skeleton,
-    Alert
+    Slider,
+    Button
 } from '@mui/material'
-import axios from 'axios'
 
 export default function Settings() {
-    const [settings, setSettings] = useState(null)
-    const [loading, setLoading] = useState(false)
-    const [saving, setSaving] = useState(false)
-    const [error, setError] = useState(null)
-    const [dirty, setDirty] = useState(false)
-
-    // При монтировании загружаем текущие настройки
-    useEffect(() => {
-        setLoading(true)
-        axios.get('/api/settings')
-            .then(({ data }) => {
-                setSettings(data)      // ожидаем { darkMode, highlightMatches, language, ... }
-                setError(null)
-            })
-            .catch(e => {
-                setError('Не удалось загрузить настройки')
-            })
-            .finally(() => setLoading(false))
-    }, [])
-
-    const handleChange = (key, value) => {
-        setSettings(prev => ({ ...prev, [key]: value }))
-        setDirty(true)
-    }
-
-    const handleSave = () => {
-        setSaving(true)
-        axios.put('/api/settings', settings)
-            .then(() => {
-                setError(null)
-                setDirty(false)
-            })
-            .catch(() => {
-                setError('Не удалось сохранить настройки')
-            })
-            .finally(() => setSaving(false))
-    }
+    // Локальные состояния для настроек
+    const [darkMode, setDarkMode] = useState(true)
+    const [highlightMatches, setHighlightMatches] = useState(true)
+    const [expandQuery, setExpandQuery] = useState(false)
+    const [language, setLanguage] = useState('ru')
+    const [pageSize, setPageSize] = useState(20)
 
     return (
-        <Box p={4}>
-            <Typography variant="h4" gutterBottom>
-                Настройки приложения
-            </Typography>
-
-            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-
-            <Card sx={{ maxWidth: 600 }}>
-                <CardHeader title="Интерфейс и поведение" />
+        <Box p={4} display="flex" justifyContent="center">
+            <Card variant="outlined" sx={{ width: 600 }}>
+                <CardHeader title="Настройки приложения" />
                 <CardContent>
-                    {loading || !settings ? (
-                        <>
-                            <Skeleton width="60%" height={40} sx={{ mb: 2 }} />
-                            <Skeleton width="60%" height={40} sx={{ mb: 2 }} />
-                            <Skeleton width="40%" height={40} />
-                        </>
-                    ) : (
-                        <>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={settings.darkMode}
-                                        onChange={e => handleChange('darkMode', e.target.checked)}
-                                    />
-                                }
-                                label="Тёмная тема"
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={darkMode}
+                                onChange={e => setDarkMode(e.target.checked)}
                             />
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={settings.highlightMatches}
-                                        onChange={e => handleChange('highlightMatches', e.target.checked)}
-                                    />
-                                }
-                                label="Подсветка совпадений в результатах"
+                        }
+                        label="Тёмная тема"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={highlightMatches}
+                                onChange={e => setHighlightMatches(e.target.checked)}
                             />
-                            <Box mt={2} display="flex" alignItems="center">
-                                <Typography variant="body1" sx={{ mr: 2 }}>
-                                    Язык интерфейса:
-                                </Typography>
-                                <Select
-                                    value={settings.language}
-                                    onChange={e => handleChange('language', e.target.value)}
-                                    size="small"
-                                >
-                                    <MenuItem value="ru">Русский</MenuItem>
-                                    <MenuItem value="en">English</MenuItem>
-                                </Select>
-                            </Box>
-                            {/* сюда можно добавить ещё какие-нибудь флаги или селекты */}
-                        </>
-                    )}
+                        }
+                        label="Подсветка совпадений"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={expandQuery}
+                                onChange={e => setExpandQuery(e.target.checked)}
+                            />
+                        }
+                        label="Авто-расширение запросов"
+                    />
+
+                    <Box mt={3} display="flex" alignItems="center" gap={2}>
+                        <Typography variant="body1">Язык интерфейса:</Typography>
+                        <Select
+                            value={language}
+                            onChange={e => setLanguage(e.target.value)}
+                            size="small"
+                        >
+                            <MenuItem value="ru">Русский</MenuItem>
+                            <MenuItem value="en">English</MenuItem>
+                        </Select>
+                    </Box>
+
+                    <Box mt={3}>
+                        <Typography gutterBottom>
+                            Результатов на странице: {pageSize}
+                        </Typography>
+                        <Slider
+                            value={pageSize}
+                            onChange={(e, v) => setPageSize(v)}
+                            min={10}
+                            max={100}
+                            step={10}
+                            valueLabelDisplay="auto"
+                        />
+                    </Box>
+
+                    <Box mt={4} display="flex" justifyContent="flex-end">
+                        <Button variant="contained">
+                            Применить
+                        </Button>
+                    </Box>
                 </CardContent>
-                <Box p={2} display="flex" justifyContent="flex-end">
-                    <Button
-                        variant="contained"
-                        disabled={!dirty || saving || loading}
-                        onClick={handleSave}
-                    >
-                        {saving ? 'Сохраняем...' : 'Сохранить'}
-                    </Button>
-                </Box>
             </Card>
         </Box>
     )
